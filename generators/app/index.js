@@ -232,10 +232,12 @@ var functions = {
           this.template('src/main/webapp/ts/_elasticsearch-reindex-modal.component.ts', jhipsterVar.webappDir + this.appFolder + '/elasticsearch-reindex-modal.component.ts', this, {});
           this.template('src/main/webapp/ts/_elasticsearch-reindex.component.html', jhipsterVar.webappDir + this.appFolder + '/elasticsearch-reindex.component.html', this, {});
           this.template('src/main/webapp/ts/_elasticsearch-reindex.component.ts', jhipsterVar.webappDir + this.appFolder + '/elasticsearch-reindex.component.ts', this, {});
-          this.template('src/main/webapp/ts/_elasticsearch-reindex.module.ts', jhipsterVar.webappDir + this.appFolder + '/elasticsearch-reindex.module.ts', this, {});
+          // this.template('src/main/webapp/ts/_elasticsearch-reindex.module.ts', jhipsterVar.webappDir + this.appFolder + '/elasticsearch-reindex.module.ts', this, {});
           this.template('src/main/webapp/ts/_elasticsearch-reindex.route.ts', jhipsterVar.webappDir + this.appFolder + '/elasticsearch-reindex.route.ts', this, {});
           this.template('src/main/webapp/ts/_elasticsearch-reindex.service.ts', jhipsterVar.webappDir + this.appFolder + '/elasticsearch-reindex.service.ts', this, {});
-          this.template('src/main/webapp/ts/_index.ts', jhipsterVar.webappDir + this.appFolder + '/index.ts', this, {});
+          // this.template('src/main/webapp/ts/_index.ts', jhipsterVar.webappDir + this.appFolder + '/index.ts', this, {});
+
+          /*
           if (this.addAdminToModule) {
             this.addAdminToModule(this.angularXAppName, 'ElasticsearchReindex', 'elasticsearch-reindex', 'elasticsearch-reindex', this.enableTranslation, this.clientFramework);
           } else {
@@ -243,6 +245,9 @@ var functions = {
             this.log(chalk.yellow('  - at the beginning of the file: ') + 'import { ' + this.angularXAppName + 'ElasticsearchReindexModule } from \'./elasticsearch-reindex/elasticsearch-reindex.module\';');
             this.log(chalk.yellow('  - inside @NgModule, imports: ') + this.angularXAppName + 'ElasticsearchReindexModule\n');
           }
+          */
+
+          /*
           if (this.addElementToAdminMenu) {
             this.addElementToAdminMenu('elasticsearch-reindex', 'fw fa-search', this.enableTranslation, this.clientFramework);
             if (this.enableTranslation) {
@@ -251,6 +256,8 @@ var functions = {
               });
             }
           }
+          */
+
           if (this.enableTranslation) {
             this.languages.forEach((language) => {
               this.template('src/main/webapp/i18n/elasticsearch-reindex.json', jhipsterVar.webappDir + 'i18n/' + language + '/elasticsearch-reindex.json', this, {});

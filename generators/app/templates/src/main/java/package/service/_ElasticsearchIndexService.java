@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import <%=packageName%>.domain.*;
 import <%=packageName%>.repository.*;
 import <%=packageName%>.repository.search.*;
-import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -47,9 +47,11 @@ public class ElasticsearchIndexService {
             entityFiles.forEach(function (file) {
                 var entity = file.split('.json')[0];
                 var entityLowerCase = entity.charAt(0).toLowerCase() + entity.slice(1); _%>
-    private final <%=entity%>Repository <%=entityLowerCase%>Repository;
+    @Autowired
+    private <%=entity%>Repository <%=entityLowerCase%>Repository;
 
-    private final <%=entity%>SearchRepository <%=entityLowerCase%>SearchRepository;
+    @Autowired
+    private <%=entity%>SearchRepository <%=entityLowerCase%>SearchRepository;
 
     <%_     });
         }
@@ -66,29 +68,11 @@ public class ElasticsearchIndexService {
         UserRepository userRepository,
         UserSearchRepository userSearchRepository,
         <%_ } _%>
-        <%_ if (applicationType === 'monolith' || applicationType === 'microservice') {
-            entityFiles.forEach(function (file) {
-                var entity = file.split('.json')[0];
-                var entityLowerCase = entity.charAt(0).toLowerCase() + entity.slice(1); _%>
-        <%=entity%>Repository <%=entityLowerCase%>Repository,
-        <%=entity%>SearchRepository <%=entityLowerCase%>SearchRepository,
-        <%_
-            });
-        } _%>
         ElasticsearchTemplate elasticsearchTemplate) {
         <%_ if (!skipUserManagement && (applicationType === 'monolith' || applicationType === 'gateway')) { _%>
         this.userRepository = userRepository;
         this.userSearchRepository = userSearchRepository;
         <%_ } _%>
-        <%_ if (applicationType === 'monolith' || applicationType === 'microservice') {
-            entityFiles.forEach(function (file) {
-                var entity = file.split('.json')[0];
-                var entityLowerCase = entity.charAt(0).toLowerCase() + entity.slice(1); _%>
-        this.<%=entityLowerCase%>Repository = <%=entityLowerCase%>Repository;
-        this.<%=entityLowerCase%>SearchRepository = <%=entityLowerCase%>SearchRepository;
-        <%_
-            });
-        } _%>
         this.elasticsearchTemplate = elasticsearchTemplate;
     }
 <%_ } else if (jhipsterMajorVersion < 4) { _%>
@@ -145,11 +129,7 @@ public class ElasticsearchIndexService {
     private <T, ID extends Serializable> void reindexForClass(Class<T> entityClass, JpaRepository<T, ID> jpaRepository,
                                                               ElasticsearchRepository<T, ID> elasticsearchRepository) {
         elasticsearchTemplate.deleteIndex(entityClass);
-        try {
-            elasticsearchTemplate.createIndex(entityClass);
-        } catch (IndexAlreadyExistsException e) {
-            // Do nothing. Index was already concurrently recreated by some other service.
-        }
+        elasticsearchTemplate.createIndex(entityClass);
         elasticsearchTemplate.putMapping(entityClass);
         if (jpaRepository.count() > 0) {
             // if a JHipster entity field is the owner side of a many-to-many relationship, it should be loaded manually
@@ -172,7 +152,7 @@ public class ElasticsearchIndexService {
 
             int size = 100;
             for (int i = 0; i <= jpaRepository.count() / size; i++) {
-                Pageable page = new PageRequest(i, size);
+                Pageable page = PageRequest.of(i, size);
                 log.info("Indexing page {} of {}, size {}", i, jpaRepository.count() / size, size);
                 Page<T> results = jpaRepository.findAll(page);
                 results.map(result -> {
@@ -187,7 +167,7 @@ public class ElasticsearchIndexService {
                     });
                     return result;
                 });
-                elasticsearchRepository.save(results.getContent());
+                elasticsearchRepository.saveAll(results.getContent());
             }
         }
         log.info("Elasticsearch: Indexed all rows for {}", entityClass.getSimpleName());
